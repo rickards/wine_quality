@@ -1,8 +1,12 @@
 #%%
 #Leitura do arquivo com dados
 import keras
+import numpy as np
 import pandas as pd
-%matplotlib inline
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+from scipy import stats
 
 df = pd.read_csv("winequality.csv", sep=";")
 
@@ -14,7 +18,11 @@ df.head()
 #Verificação dos typos de dados
 df.info()
 
+#%%
+df.describe()
+
 # %%
+# TRATAMENTO DO BANCO DE DADOS
 #type: object (vamos mudar para inteiro)
 #alcohol: object (vamos mudar para float e eliminar dados incosistentes)
 df['type'] = df['type'].map( {'White': 1, 'Red': 0} ).astype(int)
@@ -25,7 +33,18 @@ freq_port = df.alcohol.dropna().mode()[0]
 df['alcohol'] = df['alcohol'].fillna(freq_port)
 
 #%%
-#Vamos normalizar os dados para melhorar a visualização dos boxplots
+# REMOVER OUTLIERS
+# df = df[(np.abs(stats.zscore(df)) < 3).all(axis=1)]
+
+#%%
+# BOXPLOTS
+boxplot = df.boxplot(column=list(df.columns[:-1]))
+
+
+
+#%%
+# NORMALIZAÇÃO
+# Vamos normalizar os dados para melhorar a modelagem e processamento dos dados
 from sklearn import preprocessing
 
 x = df.values #returns a numpy array
@@ -35,8 +54,69 @@ df_normalized = pd.DataFrame(x_scaled, columns=df.columns)
 df_normalized['quality'] = df['quality']
 df = df_normalized
 
+
 #%%
-boxplot = df.boxplot(column=list(df.columns[:-1]))
+# Passo importante vamos avaliar cada atributo
+df[['quality', 'type']].groupby(['quality'], as_index=False).mean().sort_values(by='quality', ascending=False)
+# Atributo type parece mostrar que a incidência de vinhos de qualidade maior estão mais presentes no vinho branco.
+
+#%%
+# Para interpretar o próximo atributo é preferível usar outra abordagem
+ax = sns.violinplot(x="quality", y="fixed acidity", data=df)
+# Esse atributo não parece descritivo para o modelo do vinho
+# Vamos removelo do df
+df = df.drop(columns=['fixed acidity'])
+
+#%%
+ax = sns.boxplot(x="quality", y="volatile acidity", data=df)
+# Esse atributo já mostrou uma variedada correlacionada a qualidade, apesar de pouca
+# Interessante atributo, correlação decrescente
+
+#%%
+ax = sns.boxplot(x="quality", y="citric acid", data=df)
+df = df.drop(columns=['citric acid'])
+# Vamos eliminar alguns atributos e deixar apenas os mais relevantes
+
+#%%
+ax = sns.boxplot(x="quality", y="residual sugar", data=df)
+df = df.drop(columns=['residual sugar'])
+
+#%%
+ax = sns.boxplot(x="quality", y="chlorides", data=df)
+
+#%%
+ax = sns.boxplot(x="quality", y="free sulfur dioxide", data=df)
+# correlação decrescente
+
+#%%
+ax = sns.boxplot(x="quality", y="total sulfur dioxide", data=df)
+df = df.drop(columns=['total sulfur dioxide'])
+# eliminando atributos fracos
+
+#%%
+ax = sns.violinplot(x="quality", y="density", data=df)
+
+#%%
+ax = sns.violinplot(x="quality", y="pH", data=df)
+
+# #%%
+# # vamos categorizar, agrupar alguns intervalos
+# df.loc[ df['pH'] <= 0.3, 'pH'] = 0
+# df.loc[(df['pH'] > 0.3) & (df['pH'] <= 0.4), 'pH'] = 1
+# df.loc[(df['pH'] > 0.4) & (df['pH'] <= 0.6), 'pH'] = 2
+# df.loc[(df['pH'] > 0.6) & (df['pH'] <= 0.8), 'pH'] = 3
+# df.loc[ df['pH'] > 0.8, 'pH'] = 4
+# df['pH'] = df['pH'].astype(int)
+# ax = sns.boxplot(x="quality", y="pH", data=df)
+
+#%%
+ax = sns.boxplot(x="quality", y="sulphates", data=df)
+df = df.drop(columns=['sulphates'])
+# Não parece ser um bom atributo
+
+#%%
+ax = sns.boxplot(x="quality", y="alcohol", data=df)
+# Ótimo atributo, mostra-se bom descriminante para bons vinhos
 
 
 # %%
@@ -44,8 +124,9 @@ boxplot = df.boxplot(column=list(df.columns[:-1]))
 from sklearn.tree import DecisionTreeClassifier
 
 # cross 10-fold validation
-interval = int(len(df)/10)
-for i in range(0, len(df)+len(df)%10, interval):
+interval = int(len(df)/9)
+total_acc = []
+for i in range(0, len(df)+len(df)%9, interval):
     test_df = df.loc[i:i+interval]
     train_df = df.drop(test_df.index)
 
@@ -62,4 +143,9 @@ for i in range(0, len(df)+len(df)%10, interval):
     # predição e acc
     Y_pred = decision_tree.predict(X_test)
     acc_decision_tree = round(decision_tree.score(X_test, Y_test) * 100, 2)
-    print(acc_decision_tree)
+    total_acc.append(acc_decision_tree)
+
+print(sum(total_acc)/len(total_acc))
+
+
+# %%
