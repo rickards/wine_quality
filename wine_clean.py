@@ -14,6 +14,7 @@ from sklearn.svm import SVC, LinearSVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
+from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import Perceptron
 from sklearn.linear_model import SGDClassifier
 from sklearn.tree import DecisionTreeClassifier
@@ -107,15 +108,15 @@ ax = sns.violinplot(x="quality", y="density", data=df)
 #%%
 ax = sns.violinplot(x="quality", y="pH", data=df)
 
-# #%%
-# # vamos categorizar, agrupar alguns intervalos
-# df.loc[ df['pH'] <= 0.3, 'pH'] = 0
-# df.loc[(df['pH'] > 0.3) & (df['pH'] <= 0.4), 'pH'] = 1
-# df.loc[(df['pH'] > 0.4) & (df['pH'] <= 0.6), 'pH'] = 2
-# df.loc[(df['pH'] > 0.6) & (df['pH'] <= 0.8), 'pH'] = 3
-# df.loc[ df['pH'] > 0.8, 'pH'] = 4
-# df['pH'] = df['pH'].astype(int)
-# ax = sns.boxplot(x="quality", y="pH", data=df)
+#%%
+# vamos categorizar, agrupar alguns intervalos
+df.loc[ df['pH'] <= 0.3, 'pH'] = 0
+df.loc[(df['pH'] > 0.3) & (df['pH'] <= 0.4), 'pH'] = 1
+df.loc[(df['pH'] > 0.4) & (df['pH'] <= 0.6), 'pH'] = 2
+df.loc[(df['pH'] > 0.6) & (df['pH'] <= 0.8), 'pH'] = 3
+df.loc[ df['pH'] > 0.8, 'pH'] = 4
+df['pH'] = df['pH'].astype(int)
+ax = sns.boxplot(x="quality", y="pH", data=df)
 
 #%%
 ax = sns.boxplot(x="quality", y="sulphates", data=df)
@@ -138,7 +139,9 @@ machine_learning_techniques.append(GaussianNB())
 machine_learning_techniques.append(Perceptron())
 machine_learning_techniques.append(SGDClassifier())
 machine_learning_techniques.append(DecisionTreeClassifier())
+machine_learning_techniques.append(MultinomialNB())
 
+df = df.sample(frac=1).reset_index(drop=True)
 for tech in machine_learning_techniques:
 
     # cross 10-fold validation
@@ -164,5 +167,47 @@ for tech in machine_learning_techniques:
 
     print(f'{sum(total_acc)/len(total_acc)} {tech.__class__.__name__}')
 
+
+# %%
+# DEEP LEARNING
+import keras
+
+from keras.utils import np_utils
+
+model = keras.Sequential([
+    keras.layers.Dense(64, activation='elu', input_shape=(7,)),
+    keras.layers.GaussianDropout(0.2),
+    keras.layers.Dense(64, activation='tanh'),
+    # keras.layers.Embedding(1000, 64, input_length=7),
+    # keras.layers.GRU(128, activation='elu'),
+    keras.layers.Dense(7, activation='softmax')
+])
+
+model.compile(optimizer='adam',
+              loss='categorical_crossentropy',
+              metrics=['accuracy'])
+
+# %%
+df = df.sample(frac=1).reset_index(drop=True)
+interval = int(len(df)/10)
+print(f'interval: {interval}')
+
+test_df = df.loc[:interval]
+train_df = df.drop(test_df.index)
+
+X_test = test_df.drop("quality", axis=1)
+Y_test = test_df["quality"]-3
+
+X_train = train_df.drop("quality", axis=1)
+Y_train = train_df["quality"]-3
+
+print(np_utils.to_categorical(Y_test).shape)
+
+# treina
+model.fit(X_train, np_utils.to_categorical(Y_train, num_classes=7), epochs=100, verbose=0)
+
+# predição e acc
+_, acc_tech = model.evaluate(X_test, np_utils.to_categorical(Y_test, num_classes=7), verbose=1)
+print(acc_tech)
 
 # %%
