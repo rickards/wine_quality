@@ -8,10 +8,19 @@ import matplotlib.pyplot as plt
 
 from scipy import stats
 
-df = pd.read_csv("winequality.csv", sep=";")
+# machine learning
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC, LinearSVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.linear_model import Perceptron
+from sklearn.linear_model import SGDClassifier
+from sklearn.tree import DecisionTreeClassifier
 
 #%%
 #Visualização das 5 primeiras tuplas dos dados
+df = pd.read_csv("winequality.csv", sep=";")
 df.head()
 
 #%%
@@ -39,7 +48,6 @@ df['alcohol'] = df['alcohol'].fillna(freq_port)
 #%%
 # BOXPLOTS
 boxplot = df.boxplot(column=list(df.columns[:-1]))
-
 
 
 #%%
@@ -120,32 +128,41 @@ ax = sns.boxplot(x="quality", y="alcohol", data=df)
 
 
 # %%
-# vaoms usar árvore de decisão para avaliar acc desse modelo
-from sklearn.tree import DecisionTreeClassifier
+machine_learning_techniques = []
+machine_learning_techniques.append(LogisticRegression())
+machine_learning_techniques.append(SVC())
+machine_learning_techniques.append(LinearSVC())
+machine_learning_techniques.append(RandomForestClassifier())
+machine_learning_techniques.append(KNeighborsClassifier())
+machine_learning_techniques.append(GaussianNB())
+machine_learning_techniques.append(Perceptron())
+machine_learning_techniques.append(SGDClassifier())
+machine_learning_techniques.append(DecisionTreeClassifier())
 
-# cross 10-fold validation
-interval = int(len(df)/9)
-total_acc = []
-for i in range(0, len(df)+len(df)%9, interval):
-    test_df = df.loc[i:i+interval]
-    train_df = df.drop(test_df.index)
+for tech in machine_learning_techniques:
 
-    X_test = test_df.drop("quality", axis=1)
-    Y_test = test_df["quality"]
+    # cross 10-fold validation
+    interval = int(len(df)/9)
+    total_acc = []
+    for i in range(0, len(df)+len(df)%9, interval):
+        test_df = df.loc[i:i+interval]
+        train_df = df.drop(test_df.index)
 
-    X_train = train_df.drop("quality", axis=1)
-    Y_train = train_df["quality"]
+        X_test = test_df.drop("quality", axis=1)
+        Y_test = test_df["quality"]
 
-    # treina
-    decision_tree = DecisionTreeClassifier()
-    decision_tree.fit(X_train, Y_train)
-    
-    # predição e acc
-    Y_pred = decision_tree.predict(X_test)
-    acc_decision_tree = round(decision_tree.score(X_test, Y_test) * 100, 2)
-    total_acc.append(acc_decision_tree)
+        X_train = train_df.drop("quality", axis=1)
+        Y_train = train_df["quality"]
 
-print(sum(total_acc)/len(total_acc))
+        # treina
+        tech.fit(X_train, Y_train)
+        
+        # predição e acc
+        Y_pred = tech.predict(X_test)
+        acc_tech = round(tech.score(X_test, Y_test) * 100, 2)
+        total_acc.append(acc_tech)
+
+    print(f'{sum(total_acc)/len(total_acc)} {tech.__class__.__name__}')
 
 
 # %%
