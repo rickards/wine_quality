@@ -1,5 +1,22 @@
 # wine_quality
-Repositório responsável pela avaliação da qualidade de vinhos portugueses. Vamos realizar uma análise de dados e responder algumas perguntas que serão dispostas a seguir:
+
+Repositório responsável pela avaliação da qualidade de vinhos portugueses. São 12 características dos vinho que serão avaliadas para discriminar a qualidade do mesmo. São estes os atributos:
+
+0   type                  object 
+1   fixed acidity         float64
+2   volatile acidity      float64
+3   citric acid           float64
+4   residual sugar        float64
+5   chlorides             float64
+6   free sulfur dioxide   float64
+7   total sulfur dioxide  float64
+8   density               float64
+9   pH                    float64
+10  sulphates             float64
+11  alcohol               object 
+12  quality               int64
+
+Vamos realizar uma análise de dados e responder algumas perguntas que serão dispostas a seguir:
 
 ## a. Como foi a definição da sua estratégia de modelagem?
 
@@ -12,7 +29,7 @@ No decorrer da modelagem são explicadas, em comentários de código, as ações
 
 Para a abordagem de deep learning, treinamos uma rede neural com a loss function categorical_crossentropy. Isso porque nossos rótulos, apesar de serem números, podem ser representados por categorias de 3 à 9, onde cada vinho é rodulado apenas 1 vez. Desta forma, a loss function nos dá a diferença entre a matriz softmax resultante da matriz softmax ideal. Essa matriz ideal é uma one hot encoding, já a resultante é uma matriz de probabilidades preditas.
 
-Como bônus, foi implementado a função MSE que poderia ser vista como uma função de custo para todas as abordagens.
+Como bônus, foi implementado a função MSE que poderia ser vista como uma função de custo para todas as abordagens, ela é interessante porque amplia os erros dos modelos de forma que o erro pode apresentar uma gravidade maior dependendo da distância da resposta correta.
 
 ## c. Qual foi o critério utilizado na seleção do modelo final?
 
