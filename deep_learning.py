@@ -2,18 +2,20 @@
 # DEEP LEARNING
 import keras
 import keras.backend as K
+import pandas as pd
 import matplotlib.pyplot as plt
 
 from keras.utils import np_utils
 from data_modeling import import_data_wine, balancing
+from callback_model import TerminateTrainingLoss
 
 df = import_data_wine()
 
 model = keras.Sequential([
-    keras.layers.Dense(128, activation='elu', input_shape=(7,)),
-    keras.layers.Dropout(0.2),
-    keras.layers.Dense(64, activation='tanh'),
-    keras.layers.Dropout(0.2),
+    keras.layers.Dense(128, activation='elu', input_shape=(12,)),
+    keras.layers.Dense(64, activation='elu'),
+    keras.layers.Dense(32, activation='elu'),
+    keras.layers.Dense(16, activation='elu'),
     keras.layers.Dense(7, activation='softmax')
 ])
 
@@ -48,12 +50,16 @@ Y_train = train_df["quality"]-3
 
 print(np_utils.to_categorical(Y_test).shape)
 
+# callback
+callback = TerminateTrainingLoss()
+
 # treina
 history = model.fit(X_train, 
                     np_utils.to_categorical(Y_train, num_classes=7), 
-                    epochs=200, 
+                    epochs=1000, 
+                    callbacks=[callback],
                     verbose=1, 
-                    batch_size=32, 
+                    batch_size=128, 
                     validation_split = 0.1)
 
 # predição e acc e mse
