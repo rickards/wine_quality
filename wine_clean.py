@@ -92,6 +92,8 @@ df = df.drop(columns=['residual sugar'])
 
 #%%
 ax = sns.boxplot(x="quality", y="chlorides", data=df)
+df = df.drop(columns=['chlorides'])
+# visualmente não interessante
 
 #%%
 ax = sns.boxplot(x="quality", y="free sulfur dioxide", data=df)
@@ -99,22 +101,28 @@ ax = sns.boxplot(x="quality", y="free sulfur dioxide", data=df)
 
 #%%
 ax = sns.boxplot(x="quality", y="total sulfur dioxide", data=df)
-df = df.drop(columns=['total sulfur dioxide'])
-# eliminando atributos fracos
+# algumas características só aparecem em vinhos com qualidade inferior
 
 #%%
 ax = sns.violinplot(x="quality", y="density", data=df)
+
+#%%
+# vamos categorizar, agrupar alguns intervalos
+df.loc[ df['density'] <= 0.2, 'density'] = 0
+df.loc[ df['density'] > 0.2, 'density'] = 1
+df['density'] = df['density'].astype(int)
+ax = sns.boxplot(x="quality", y="density", data=df)
 
 #%%
 ax = sns.violinplot(x="quality", y="pH", data=df)
 
 #%%
 # vamos categorizar, agrupar alguns intervalos
-df.loc[ df['pH'] <= 0.3, 'pH'] = 0
-df.loc[(df['pH'] > 0.3) & (df['pH'] <= 0.4), 'pH'] = 1
-df.loc[(df['pH'] > 0.4) & (df['pH'] <= 0.6), 'pH'] = 2
-df.loc[(df['pH'] > 0.6) & (df['pH'] <= 0.8), 'pH'] = 3
 df.loc[ df['pH'] > 0.8, 'pH'] = 4
+df.loc[(df['pH'] > 0.6) & (df['pH'] <= 0.8), 'pH'] = 3
+df.loc[(df['pH'] > 0.4) & (df['pH'] <= 0.6), 'pH'] = 2
+df.loc[(df['pH'] > 0.3) & (df['pH'] <= 0.4), 'pH'] = 1
+df.loc[ df['pH'] <= 0.3, 'pH'] = 0
 df['pH'] = df['pH'].astype(int)
 ax = sns.boxplot(x="quality", y="pH", data=df)
 
@@ -175,17 +183,20 @@ import keras
 from keras.utils import np_utils
 
 model = keras.Sequential([
-    keras.layers.Dense(64, activation='elu', input_shape=(7,)),
-    keras.layers.GaussianDropout(0.2),
-    keras.layers.Dense(64, activation='tanh'),
     # keras.layers.Embedding(1000, 64, input_length=7),
+    # keras.layers.Flatten(),
+    keras.layers.Dense(128, activation='elu', input_shape=(7,)),
+    keras.layers.Dropout(0.2),
+    keras.layers.Dense(64, activation='tanh'),
+    keras.layers.Dropout(0.2),
     # keras.layers.GRU(128, activation='elu'),
     keras.layers.Dense(7, activation='softmax')
 ])
 
-model.compile(optimizer='adam',
+adam = keras.optimizers.Adam(learning_rate=0.004)
+model.compile(optimizer=adam,
               loss='categorical_crossentropy',
-              metrics=['accuracy'])
+              metrics=['acc'])
 
 # %%
 df = df.sample(frac=1).reset_index(drop=True)
@@ -204,10 +215,33 @@ Y_train = train_df["quality"]-3
 print(np_utils.to_categorical(Y_test).shape)
 
 # treina
-model.fit(X_train, np_utils.to_categorical(Y_train, num_classes=7), epochs=100, verbose=0)
+history = model.fit(X_train, np_utils.to_categorical(Y_train, num_classes=7), epochs=200, verbose=0, batch_size=16, validation_split = 0.1)
 
 # predição e acc
 _, acc_tech = model.evaluate(X_test, np_utils.to_categorical(Y_test, num_classes=7), verbose=1)
 print(acc_tech)
 
 # %%
+# summarize history for accuracy
+plt.plot(history.history['acc'])
+plt.plot(history.history['val_acc'])
+plt.title('model accuracy')
+plt.ylabel('accuracy')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.show()
+
+# Plot training & validation loss values
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('Model loss')
+plt.ylabel('Loss')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Test'], loc='upper left')
+plt.show()
+
+# %%
+df.to_csv("teste.csv", sep=";")
+
+# %%
+print(history.history.keys())
