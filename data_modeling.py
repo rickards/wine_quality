@@ -1,5 +1,6 @@
 #%%
 #Leitura do arquivo com dados
+import math
 import keras
 import numpy as np
 import pandas as pd
@@ -11,14 +12,6 @@ from sklearn import preprocessing
 #%%
 #Visualização das 5 primeiras tuplas dos dados
 df = pd.read_csv("winequality.csv", sep=";")
-df.head()
-
-#%%
-#Verificação dos typos de dados
-df.info()
-
-#%%
-df.describe()
 
 # %%
 # TRATAMENTO DO BANCO DE DADOS
@@ -65,9 +58,8 @@ df[['quality', 'type']].groupby(['quality'], as_index=False).mean().sort_values(
 #%%
 # Para interpretar o próximo atributo é preferível usar outra abordagem
 ax = sns.violinplot(x="quality", y="fixed acidity", data=df)
-# Esse atributo não parece descritivo para o modelo do vinho
-# Vamos removelo do df
-df = df.drop(columns=['fixed acidity'])
+# Esse atributo não parece ser muito descritivo porém, para os casos de qualidade 3 e 9,
+# eles se dirvegem com uma barriga maior (maior frequência dos dados) nos vinhos de alta qualidade
 
 #%%
 ax = sns.boxplot(x="quality", y="volatile acidity", data=df)
@@ -76,8 +68,9 @@ ax = sns.boxplot(x="quality", y="volatile acidity", data=df)
 
 #%%
 ax = sns.boxplot(x="quality", y="citric acid", data=df)
-df = df.drop(columns=['citric acid'])
+# df = df.drop(columns=['citric acid'])
 # Vamos eliminar alguns atributos e deixar apenas os mais relevantes
+
 
 #%%
 ax = sns.boxplot(x="quality", y="residual sugar", data=df)
@@ -85,8 +78,7 @@ df = df.drop(columns=['residual sugar'])
 
 #%%
 ax = sns.boxplot(x="quality", y="chlorides", data=df)
-df = df.drop(columns=['chlorides'])
-# visualmente não interessante
+# sutilmente os vinhos com mais qualidade estão em um intervalo mais curto
 
 #%%
 ax = sns.boxplot(x="quality", y="free sulfur dioxide", data=df)
@@ -109,20 +101,11 @@ ax = sns.boxplot(x="quality", y="density", data=df)
 
 #%%
 ax = sns.violinplot(x="quality", y="pH", data=df)
-
-#%%
-# vamos categorizar, agrupar alguns intervalos
-df.loc[ df['pH'] > 0.8, 'pH'] = 4
-df.loc[(df['pH'] > 0.6) & (df['pH'] <= 0.8), 'pH'] = 3
-df.loc[(df['pH'] > 0.4) & (df['pH'] <= 0.6), 'pH'] = 2
-df.loc[(df['pH'] > 0.3) & (df['pH'] <= 0.4), 'pH'] = 1
-df.loc[ df['pH'] <= 0.3, 'pH'] = 0
-df['pH'] = df['pH'].astype(int)
-ax = sns.boxplot(x="quality", y="pH", data=df)
+# quanto maior a qualidade, mais esparsa é o intervalo de confiança da amostra
 
 #%%
 ax = sns.boxplot(x="quality", y="sulphates", data=df)
-df = df.drop(columns=['sulphates'])
+# df = df.drop(columns=['sulphates'])
 # Não parece ser um bom atributo
 
 #%%
@@ -154,3 +137,5 @@ def balancing(df):
             df = df.append(df[df['quality']==quality])
 
     return df
+
+# %%

@@ -14,6 +14,7 @@ from data_modeling import import_data_wine, balancing
 
 df = import_data_wine()
 
+
 # %%
 # Vale lembrar que cada técnica tem diversos hiperparâmetros que podiam ser explorados e que em contextos específicos aumentam gradativamente os resultados positivos.
 machine_learning_techniques = []
