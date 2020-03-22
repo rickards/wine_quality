@@ -33,11 +33,13 @@ df['alcohol'] = df['alcohol'].fillna(freq_port)
 
 #%%
 # REMOVER OUTLIERS
-z_scores = stats.zscore(df) #calculate z-scores of `df` média 0 desvio padrão 1
-abs_z_scores = np.abs(z_scores)
-filtered_entries = (abs_z_scores < 3).all(axis=1)
-df = df[filtered_entries]
-df = df.sample(frac=1).reset_index(drop=True)
+# z_scores = stats.zscore(df) #calculate z-scores of `df` média 0 desvio padrão 1
+# abs_z_scores = np.abs(z_scores)
+# filtered_entries = (abs_z_scores < 3).all(axis=1)
+# df = df[filtered_entries]
+# df = df.sample(frac=1).reset_index(drop=True)
+
+# Não vamos remover outliers por que eliminam nossos dados de qualidade 3 e 9
 
 #%%
 # BOXPLOTS
@@ -52,7 +54,8 @@ min_max_scaler = preprocessing.MinMaxScaler()
 x_scaled = min_max_scaler.fit_transform(x)
 df_normalized = pd.DataFrame(x_scaled, columns=df.columns)
 df_normalized['quality'] = df['quality']
-df = df_normalized
+df = df_normalized.drop_duplicates()
+
 
 #%%
 # Passo importante vamos avaliar cada atributo
@@ -125,10 +128,24 @@ df = df.drop(columns=['sulphates'])
 ax = sns.boxplot(x="quality", y="alcohol", data=df)
 # Ótimo atributo, mostra-se bom descriminante para bons vinhos
 
+#%%
+distribution = df[['quality', 'type']].groupby(['quality'], as_index=False).count().sort_values(by='quality', ascending=False)
+
+#%%
+# BALANCEAMENTO DOS DADOS
+# Algumas técnicas utilizam da distribuição dos dados para os cálculos de probabilidade
+# então, há  uma tendência para redução de acurácia para essas técnicas e aumento para outras
+# Balanceamento não é isonômico para não atrapalhar muitos alguns modelos que precisam das distribuições proporcionais.
+# TODO: melhorar o balanceamento para que todas as quantidades sejam iguais
+max_dist = max(distribution['type'])
+for quality in distribution['quality']:
+    while (len(df[df['quality']==quality])<max_dist/2):
+        df = df.append(df[df['quality']==quality])
 
 # %%
 df.to_csv("winequality_cleaned.csv", sep=";", index=False)
 
 def import_data_wine():
     # Mantive a execução da geração deste arquivo para facilitar o acompanhamento do jupyter notebook
+    # Mas a ideia aqui seria gerar se não tivesse criado, ou apenas ler e retornar se já existisse.
     return pd.read_csv("winequality_cleaned.csv", sep=";")

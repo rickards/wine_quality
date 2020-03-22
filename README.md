@@ -16,7 +16,7 @@ Como bônus, foi implementado a função MSE que poderia ser vista como uma fun�
 
 ## c. Qual foi o critério utilizado na seleção do modelo final?
 
-Para seleção deste modelo específico, de uma forma rápida, escolheria o com maior acurácia, que no nosso caso foi RandomForestClassifier com 68.37%. Porém, para análise mais profunda, podemos avaliar o quão grave o modelo erra, quando erra. Há casos que a gravidade do erro pode comprometer todo o interesse de usar o modelo. Nestes casos, gosto de avaliar com a métrica RMSE, para verificar o quão distante da resposta certa estão as predições do modelo.
+Para seleção deste modelo específico, de uma forma rápida, escolheria o com maior acurácia, que no nosso caso foi RandomForestClassifier com 84.13%. Porém, para análise mais profunda, podemos avaliar o quão grave o modelo erra, quando erra. Há casos que a gravidade do erro pode comprometer todo o interesse de usar o modelo. Nestes casos, gosto de avaliar com a métrica RMSE, para verificar o quão distante da resposta certa estão as predições do modelo.
 
 ## d. Qual foi o critério utilizado para validação do modelo? Por que escolheu utilizar este método?
 
