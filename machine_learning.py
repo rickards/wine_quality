@@ -66,4 +66,3 @@ for tech in machine_learning_techniques:
     acc_mean = sum(total_acc)/len(total_acc)
     rmse_mean = sum(total_rmse)/len(total_rmse)
     print(f'acc: {round(acc_mean, 2)} - rmse: {round(rmse_mean, 2)} {tech.__class__.__name__}')
-    # input()

@@ -68,13 +68,13 @@ ax = sns.boxplot(x="quality", y="volatile acidity", data=df)
 
 #%%
 ax = sns.boxplot(x="quality", y="citric acid", data=df)
-# df = df.drop(columns=['citric acid'])
-# Vamos eliminar alguns atributos e deixar apenas os mais relevantes
-
+# isoladamente não parece um bom preditor, mas quando combinado com chlorides, parece
+# ter algum potencial
 
 #%%
 ax = sns.boxplot(x="quality", y="residual sugar", data=df)
-df = df.drop(columns=['residual sugar'])
+# isoladamente não parece um bom preditor, mas quando combinado com chlorides, parece
+# ter algum potencial
 
 #%%
 ax = sns.boxplot(x="quality", y="chlorides", data=df)
@@ -105,8 +105,7 @@ ax = sns.violinplot(x="quality", y="pH", data=df)
 
 #%%
 ax = sns.boxplot(x="quality", y="sulphates", data=df)
-# df = df.drop(columns=['sulphates'])
-# Não parece ser um bom atributo
+# Não parece ser um bom atributo, porém delimita subconjuntos simples (3 e 9), (7 e 8) e (4,5 e 6)
 
 #%%
 ax = sns.boxplot(x="quality", y="alcohol", data=df)
