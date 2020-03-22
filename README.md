@@ -2,19 +2,19 @@
 
 Repositório responsável pela avaliação da qualidade de vinhos portugueses. São 12 características dos vinho que serão avaliadas para discriminar a qualidade do mesmo. São estes os atributos:
 
-0   type                  object 
-1   fixed acidity         float64
-2   volatile acidity      float64
-3   citric acid           float64
-4   residual sugar        float64
-5   chlorides             float64
-6   free sulfur dioxide   float64
-7   total sulfur dioxide  float64
-8   density               float64
-9   pH                    float64
-10  sulphates             float64
-11  alcohol               object 
-12  quality               int64
+* 0   type                  object 
+* 1   fixed acidity         float64
+* 2   volatile acidity      float64
+* 3   citric acid           float64
+* 4   residual sugar        float64
+* 5   chlorides             float64
+* 6   free sulfur dioxide   float64
+* 7   total sulfur dioxide  float64
+* 8   density               float64
+* 9   pH                    float64
+* 10  sulphates             float64
+* 11  alcohol               object 
+* 12  quality               int64
 
 Vamos realizar uma análise de dados e responder algumas perguntas que serão dispostas a seguir:
 
@@ -45,6 +45,6 @@ A partir das observações, as maiores evidências que o modelo é bom são seus
 
 # Dicas de uso:
 
-1 - Crie um ambiente virtual em python
-2 - Instale os pacotes nescessários com pip install -r requiremnets.txt
-3 - Execute cada arquivo .py isoladamente ou com extensão jupyter notebook do visualcode parcialmente
+* 1 - Crie um ambiente virtual em python
+* 2 - Instale os pacotes nescessários com pip install -r requiremnets.txt
+* 3 - Execute cada arquivo .py isoladamente ou com extensão jupyter notebook do visualcode parcialmente
