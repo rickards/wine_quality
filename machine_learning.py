@@ -1,5 +1,4 @@
 # machine learning
-from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC, LinearSVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
@@ -17,7 +16,6 @@ df = import_data_wine()
 
 # %%
 machine_learning_techniques = []
-machine_learning_techniques.append(LogisticRegression())
 machine_learning_techniques.append(SVC())
 machine_learning_techniques.append(LinearSVC())
 machine_learning_techniques.append(RandomForestClassifier())
@@ -52,9 +50,7 @@ for tech in machine_learning_techniques:
         tech.fit(X_train, Y_train)
         
         # predição e acc
-        # print(X_test)
         Y_pred = tech.predict(X_test)
-        print(Y_pred)
         
         acc_tech = round(tech.score(X_test, Y_test) * 100, 2)
         mse = mean_squared_error(Y_test, Y_pred)
