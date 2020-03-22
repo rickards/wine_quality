@@ -1,6 +1,7 @@
 # %%
 # DEEP LEARNING
 import keras
+import keras.backend as K
 import matplotlib.pyplot as plt
 
 from keras.utils import np_utils
@@ -16,10 +17,15 @@ model = keras.Sequential([
     keras.layers.Dense(7, activation='softmax')
 ])
 
+def RMSE(y_true, y_pred):
+    # Um pouco diferente da abordagem do sklearn por que utiliza das probabilidades da softmax 
+    # (não comparável até que se utilizem a mesma abordagem para avaliação)
+    return K.sqrt(K.mean(K.square(y_pred - y_true))) 
+
 adam = keras.optimizers.Adam(learning_rate=0.004)
 model.compile(optimizer=adam,
               loss='categorical_crossentropy',
-              metrics=['acc', 'mse'])
+              metrics=['acc', RMSE])
 
 # %%
 df = df.sample(frac=1).reset_index(drop=True)
@@ -74,10 +80,10 @@ plt.legend(['Train', 'Test'], loc='upper left')
 plt.show()
 
 # Plot training & validation mse values
-plt.plot(history.history['mse'])
-plt.plot(history.history['val_mse'])
+plt.plot(history.history['RMSE'])
+plt.plot(history.history['val_RMSE'])
 plt.title('Model mse')
-plt.ylabel('MSE')
+plt.ylabel('RMSE')
 plt.xlabel('Epoch')
 plt.legend(['Train', 'Test'], loc='upper left')
 plt.show()

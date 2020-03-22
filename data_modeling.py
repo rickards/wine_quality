@@ -37,6 +37,7 @@ z_scores = stats.zscore(df) #calculate z-scores of `df` média 0 desvio padrão 
 abs_z_scores = np.abs(z_scores)
 filtered_entries = (abs_z_scores < 3).all(axis=1)
 df = df[filtered_entries]
+df = df.sample(frac=1).reset_index(drop=True)
 
 #%%
 # BOXPLOTS
@@ -129,4 +130,5 @@ ax = sns.boxplot(x="quality", y="alcohol", data=df)
 df.to_csv("winequality_cleaned.csv", sep=";", index=False)
 
 def import_data_wine():
+    # Mantive a execução da geração deste arquivo para facilitar o acompanhamento do jupyter notebook
     return pd.read_csv("winequality_cleaned.csv", sep=";")

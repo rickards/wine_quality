@@ -34,6 +34,7 @@ for tech in machine_learning_techniques:
     # cross 10-fold validation
     interval = int(len(df)/9)
     total_acc = []
+    total_rmse = []
     for i in range(0, len(df)+len(df)%9, interval):
         test_df = df.loc[i:i+interval]
         train_df = df.drop(test_df.index)
@@ -50,9 +51,11 @@ for tech in machine_learning_techniques:
         # predição e acc
         Y_pred = tech.predict(X_test)
         acc_tech = round(tech.score(X_test, Y_test) * 100, 2)
-        # MSE = accuracy_score(Y_test, Y_pred)
+        mse = mean_squared_error(Y_test, Y_pred)
         # print(f'acc: {acc_tech} mse:{MSE}')
         total_acc.append(acc_tech)
+        total_rmse.append(mse)
 
     acc_mean = sum(total_acc)/len(total_acc)
-    print(f'{round(acc_mean, 2)} {tech.__class__.__name__}')
+    rmse_mean = sum(total_rmse)/len(total_rmse)
+    print(f'acc: {round(acc_mean, 2)} - rmse: {round(rmse_mean, 2)} {tech.__class__.__name__}')
