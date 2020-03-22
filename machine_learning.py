@@ -10,11 +10,12 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import accuracy_score
 
-from data_modeling import import_data_wine
+from data_modeling import import_data_wine, balancing
 
 df = import_data_wine()
 
 # %%
+# Vale lembrar que cada técnica tem diversos hiperparâmetros que podiam ser explorados e que em contextos específicos aumentam gradativamente os resultados positivos.
 machine_learning_techniques = []
 machine_learning_techniques.append(SVC())
 machine_learning_techniques.append(LinearSVC())
@@ -38,7 +39,10 @@ for tech in machine_learning_techniques:
         test_df = df.loc[i:i+interval]
         if i+interval > len(df)-interval:
             test_df = df.loc[i:]
+
         train_df = df.drop(test_df.index)
+        # Balanceamento não melhorou a predição dos modelos e por isso não foi utilizado, seguimos com a distribuição reais dos dados.
+        # train_df = balancing(train_df)
 
         X_test = test_df.drop("quality", axis=1)
         Y_test = test_df["quality"]

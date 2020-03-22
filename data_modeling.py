@@ -54,7 +54,7 @@ min_max_scaler = preprocessing.MinMaxScaler()
 x_scaled = min_max_scaler.fit_transform(x)
 df_normalized = pd.DataFrame(x_scaled, columns=df.columns)
 df_normalized['quality'] = df['quality']
-df = df_normalized.drop_duplicates()
+df = df_normalized
 
 
 #%%
@@ -102,7 +102,8 @@ ax = sns.violinplot(x="quality", y="density", data=df)
 #%%
 # vamos categorizar, agrupar alguns intervalos
 df.loc[ df['density'] <= 0.2, 'density'] = 0
-df.loc[ df['density'] > 0.2, 'density'] = 1
+df.loc[(df['density'] > 0.2) & (df['density'] <= 0.6), 'pH'] = 1
+df.loc[ df['density'] > 0.6, 'density'] = 2
 df['density'] = df['density'].astype(int)
 ax = sns.boxplot(x="quality", y="density", data=df)
 
@@ -126,21 +127,8 @@ df = df.drop(columns=['sulphates'])
 
 #%%
 ax = sns.boxplot(x="quality", y="alcohol", data=df)
-# Ótimo atributo, mostra-se bom descriminante para bons vinhos
+# Ótimo atributo, mostra-se bom descriminante para bons vi
 
-#%%
-distribution = df[['quality', 'type']].groupby(['quality'], as_index=False).count().sort_values(by='quality', ascending=False)
-
-#%%
-# BALANCEAMENTO DOS DADOS
-# Algumas técnicas utilizam da distribuição dos dados para os cálculos de probabilidade
-# então, há  uma tendência para redução de acurácia para essas técnicas e aumento para outras
-# Balanceamento não é isonômico para não atrapalhar muitos alguns modelos que precisam das distribuições proporcionais.
-# TODO: melhorar o balanceamento para que todas as quantidades sejam iguais
-max_dist = max(distribution['type'])
-for quality in distribution['quality']:
-    while (len(df[df['quality']==quality])<max_dist/2):
-        df = df.append(df[df['quality']==quality])
 
 # %%
 df.to_csv("winequality_cleaned.csv", sep=";", index=False)
@@ -149,3 +137,20 @@ def import_data_wine():
     # Mantive a execução da geração deste arquivo para facilitar o acompanhamento do jupyter notebook
     # Mas a ideia aqui seria gerar se não tivesse criado, ou apenas ler e retornar se já existisse.
     return pd.read_csv("winequality_cleaned.csv", sep=";")
+
+def balancing(df):
+    #%%
+    distribution = df[['quality', 'type']].groupby(['quality'], as_index=False).count().sort_values(by='quality', ascending=False)
+
+    #%%
+    # BALANCEAMENTO DOS DADOS
+    # Algumas técnicas utilizam da distribuição dos dados para os cálculos de probabilidade
+    # então, há  uma tendência para redução de acurácia para essas técnicas e aumento para outras
+    # Balanceamento não é isonômico para não atrapalhar muitos alguns modelos que precisam das distribuições proporcionais.
+    # TODO: melhorar o balanceamento para que todas as quantidades sejam iguais
+    max_dist = max(distribution['type'])
+    for quality in distribution['quality']:
+        while (len(df[df['quality']==quality])<max_dist/2):
+            df = df.append(df[df['quality']==quality])
+
+    return df

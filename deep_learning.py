@@ -5,7 +5,7 @@ import keras.backend as K
 import matplotlib.pyplot as plt
 
 from keras.utils import np_utils
-from data_modeling import import_data_wine
+from data_modeling import import_data_wine, balancing
 
 df = import_data_wine()
 
@@ -34,6 +34,8 @@ print(f'interval: {interval}')
 
 test_df = df.loc[:interval]
 train_df = df.drop(test_df.index)
+# Balanceamento não melhorou a predição dos modelos e por isso não foi utilizado, seguimos com a distribuição reais dos dados.
+# train_df = balancing(train_df)
 
 # Como parte do pré processamento vamos transformar o label em matriz identidade
 # por isso vamos simplificar o valor desse resultado para um intervalo melhor aceitável
