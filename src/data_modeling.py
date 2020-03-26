@@ -98,7 +98,7 @@ ax = sns.violinplot(x="quality", y="density", data=df)
 #%%
 # vamos categorizar, agrupar alguns intervalos
 df.loc[ df['density'] <= 0.2, 'density'] = 0
-df.loc[(df['density'] > 0.2) & (df['density'] <= 0.6), 'pH'] = 1
+df.loc[(df['density'] > 0.2) & (df['density'] <= 0.6), 'density'] = 1
 df.loc[ df['density'] > 0.6, 'density'] = 2
 df['density'] = df['density'].astype(int)
 ax = sns.boxplot(x="quality", y="density", data=df)
@@ -113,7 +113,7 @@ ax = sns.boxplot(x="quality", y="sulphates", data=df)
 
 #%%
 ax = sns.boxplot(x="quality", y="alcohol", data=df)
-# Ótimo atributo, mostra-se bom descriminante para bons vi
+# Ótimo atributo, mostra-se bom representante para bons vinhos
 
 
 # %%
