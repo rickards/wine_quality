@@ -1,0 +1,4 @@
+.vscode
+__pycache__
+winequality.csv
+winequality_cleaned.csv

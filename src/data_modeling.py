@@ -24,6 +24,10 @@ df['alcohol'] = pd.to_numeric(df['alcohol'], errors='coerce')
 freq_port = df.alcohol.dropna().mode()[0]
 df['alcohol'] = df['alcohol'].fillna(freq_port)
 
+# Adiciono uma nova variável com a proporção de dioxide
+df['prop dioxide'] = df['free sulfur dioxide']/df['total sulfur dioxide']
+
+
 #%%
 # REMOVER OUTLIERS
 # z_scores = stats.zscore(df) #calculate z-scores of `df` média 0 desvio padrão 1
