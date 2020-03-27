@@ -24,6 +24,10 @@ df['alcohol'] = pd.to_numeric(df['alcohol'], errors='coerce')
 freq_port = df.alcohol.dropna().mode()[0]
 df['alcohol'] = df['alcohol'].fillna(freq_port)
 
+# Adiciono uma nova variável com a proporção de dioxide
+df['prop dioxide'] = df['free sulfur dioxide']/df['total sulfur dioxide']
+
+
 #%%
 # REMOVER OUTLIERS
 # z_scores = stats.zscore(df) #calculate z-scores of `df` média 0 desvio padrão 1
@@ -94,7 +98,7 @@ ax = sns.violinplot(x="quality", y="density", data=df)
 #%%
 # vamos categorizar, agrupar alguns intervalos
 df.loc[ df['density'] <= 0.2, 'density'] = 0
-df.loc[(df['density'] > 0.2) & (df['density'] <= 0.6), 'pH'] = 1
+df.loc[(df['density'] > 0.2) & (df['density'] <= 0.6), 'density'] = 1
 df.loc[ df['density'] > 0.6, 'density'] = 2
 df['density'] = df['density'].astype(int)
 ax = sns.boxplot(x="quality", y="density", data=df)
@@ -109,7 +113,7 @@ ax = sns.boxplot(x="quality", y="sulphates", data=df)
 
 #%%
 ax = sns.boxplot(x="quality", y="alcohol", data=df)
-# Ótimo atributo, mostra-se bom descriminante para bons vi
+# Ótimo atributo, mostra-se bom representante para bons vinhos
 
 
 # %%

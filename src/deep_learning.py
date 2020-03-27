@@ -12,7 +12,7 @@ from callback_model import TerminateTrainingLoss
 df = import_data_wine()
 
 model = keras.Sequential([
-    keras.layers.Dense(128, activation='elu', input_shape=(12,)),
+    keras.layers.Dense(128, activation='elu', input_shape=(13,)),
     keras.layers.Dense(64, activation='elu'),
     keras.layers.Dense(32, activation='elu'),
     keras.layers.Dense(16, activation='elu'),
